@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "patient": "I feel like I'm failing at everything lately.",
+    "empathetic": "It sounds like you're feeling really overwhelmed, and that must be really tough to carry.",
+    "non_empathetic": "You just need to work harder and stop worrying so much."
+  },
+  {
+    "id": 2,
+    "patient": "I don't think anyone really cares about me.",
+    "empathetic": "I hear how lonely that must feel, and it makes sense you'd be hurting.",
+    "non_empathetic": "That's not true, plenty of people care if you think about it."
+  },
+  {
+    "id": 3,
+    "patient": "I get so anxious before speaking in front of people.",
+    "empathetic": "Public speaking can be really nerve-wracking, it makes sense that you'd feel anxious.",
+    "non_empathetic": "You should just practice more and then you won't be anxious."
+  }
+]

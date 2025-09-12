@@ -1,0 +1,154 @@
+"""
+Unified evaluator for running multiple benchmarks.
+"""
+
+import os
+import json
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+from .base_benchmark import BaseBenchmark
+from .registry import BenchmarkRegistry
+
+
+class BenchmarkEvaluator:
+    """Unified evaluator for running benchmarks across multiple models."""
+    
+    def __init__(self, results_dir: str = "results"):
+        self.results_dir = results_dir
+        os.makedirs(results_dir, exist_ok=True)
+    
+    def run_benchmark(
+        self, 
+        benchmark_name: str, 
+        model_name: str, 
+        model_func: callable,
+        **model_kwargs
+    ) -> Dict[str, Any]:
+        """
+        Run a single benchmark with a single model.
+        
+        Args:
+            benchmark_name: Name of the benchmark to run
+            model_name: Name of the model being evaluated
+            model_func: Function that takes a prompt and returns a response
+            **model_kwargs: Additional model-specific parameters
+            
+        Returns:
+            Dictionary containing results and metrics
+        """
+        # Get benchmark instance
+        benchmark = BenchmarkRegistry.get_benchmark(benchmark_name)
+        
+        # Run evaluation
+        print(f"Running {benchmark_name} with {model_name}...")
+        results = benchmark.evaluate_model(model_name, model_func, **model_kwargs)
+        
+        # Calculate metrics
+        metrics = benchmark.calculate_metrics(results)
+        
+        # Prepare final results
+        final_results = {
+            "benchmark": benchmark_name,
+            "model": model_name,
+            "timestamp": datetime.now().isoformat(),
+            "metrics": metrics,
+            "num_examples": len(results),
+            "results": results
+        }
+        
+        # Save results
+        self._save_results(final_results)
+        
+        return final_results
+    
+    def run_all_benchmarks(
+        self, 
+        model_name: str, 
+        model_func: callable,
+        benchmark_names: Optional[List[str]] = None,
+        **model_kwargs
+    ) -> Dict[str, Dict[str, Any]]:
+        """
+        Run all benchmarks (or specified ones) with a single model.
+        
+        Args:
+            model_name: Name of the model being evaluated
+            model_func: Function that takes a prompt and returns a response
+            benchmark_names: List of benchmark names to run (None for all)
+            **model_kwargs: Additional model-specific parameters
+            
+        Returns:
+            Dictionary mapping benchmark names to results
+        """
+        if benchmark_names is None:
+            benchmark_names = BenchmarkRegistry.list_benchmarks()
+        
+        all_results = {}
+        for benchmark_name in benchmark_names:
+            try:
+                results = self.run_benchmark(benchmark_name, model_name, model_func, **model_kwargs)
+                all_results[benchmark_name] = results
+            except Exception as e:
+                print(f"Error running {benchmark_name}: {e}")
+                all_results[benchmark_name] = {"error": str(e)}
+        
+        return all_results
+    
+    def _save_results(self, results: Dict[str, Any]):
+        """Save results to file."""
+        benchmark_name = results["benchmark"]
+        model_name = results["model"]
+        timestamp = results["timestamp"].replace(":", "-")
+        
+        filename = f"{benchmark_name}_{model_name}_{timestamp}.json"
+        filepath = os.path.join(self.results_dir, filename)
+        
+        with open(filepath, 'w') as f:
+            json.dump(results, f, indent=2)
+        
+        print(f"Results saved to {filepath}")
+    
+    def generate_leaderboard(self, output_file: str = "results/leaderboard.md"):
+        """Generate a markdown leaderboard from all results."""
+        leaderboard_data = self._collect_leaderboard_data()
+        
+        with open(output_file, 'w') as f:
+            f.write("# LLM Benchmarking Leaderboard\n\n")
+            f.write("This leaderboard tracks results across all benchmarks.\n\n")
+            
+            for benchmark_name, models in leaderboard_data.items():
+                f.write(f"## {benchmark_name}\n\n")
+                f.write("| Model | Accuracy | F1 Score | Examples |\n")
+                f.write("|-------|----------|----------|----------|\n")
+                
+                for model_name, metrics in models.items():
+                    acc = metrics.get('accuracy', 0.0)
+                    f1 = metrics.get('f1_score', 0.0)
+                    examples = metrics.get('num_examples', 0)
+                    f.write(f"| {model_name} | {acc:.3f} | {f1:.3f} | {examples} |\n")
+                
+                f.write("\n")
+    
+    def _collect_leaderboard_data(self) -> Dict[str, Dict[str, Dict[str, float]]]:
+        """Collect all results for leaderboard generation."""
+        leaderboard = {}
+        
+        for filename in os.listdir(self.results_dir):
+            if filename.endswith('.json'):
+                try:
+                    with open(os.path.join(self.results_dir, filename), 'r') as f:
+                        data = json.load(f)
+                    
+                    benchmark_name = data.get('benchmark', 'unknown')
+                    model_name = data.get('model', 'unknown')
+                    metrics = data.get('metrics', {})
+                    
+                    if benchmark_name not in leaderboard:
+                        leaderboard[benchmark_name] = {}
+                    
+                    leaderboard[benchmark_name][model_name] = metrics
+                    
+                except Exception as e:
+                    print(f"Error reading {filename}: {e}")
+        
+        return leaderboard

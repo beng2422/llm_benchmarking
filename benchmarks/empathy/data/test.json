@@ -1,0 +1,14 @@
+[
+  {
+    "id": 101,
+    "patient": "I feel exhausted all the time, no matter how much I sleep.",
+    "empathetic": "That sounds so draining, it must be hard to get through your days feeling that way.",
+    "non_empathetic": "Maybe you should just go to bed earlier."
+  },
+  {
+    "id": 102,
+    "patient": "I don't think I'll ever be good enough for this job.",
+    "empathetic": "It sounds like you're putting a lot of pressure on yourself, and that feels really discouraging.",
+    "non_empathetic": "If you don't think you're good enough, maybe it's the wrong job."
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "question": "If you drop a glass on a hard floor, what will most likely happen?",
+    "options": {
+      "A": "The glass will bounce back up",
+      "B": "The glass will break",
+      "C": "The glass will turn into water",
+      "D": "The glass will float in the air"
+    },
+    "correct_answer": "B",
+    "explanation": "Glass is brittle and will break when dropped on a hard surface."
+  },
+  {
+    "id": 2,
+    "question": "What happens to water when it gets very cold?",
+    "options": {
+      "A": "It becomes invisible",
+      "B": "It turns into ice",
+      "C": "It disappears",
+      "D": "It becomes hot"
+    },
+    "correct_answer": "B",
+    "explanation": "Water freezes and becomes ice when the temperature drops below 0°C."
+  },
+  {
+    "id": 3,
+    "question": "If you plant a seed in soil and water it regularly, what will happen?",
+    "options": {
+      "A": "The seed will turn into a rock",
+      "B": "The seed will grow into a plant",
+      "C": "The seed will become invisible",
+      "D": "The seed will turn into gold"
+    },
+    "correct_answer": "B",
+    "explanation": "Seeds grow into plants when given proper soil, water, and care."
+  }
+]
