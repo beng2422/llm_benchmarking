@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "category": "arithmetic",
+    "difficulty": "easy",
+    "question": "What is 15 + 27?",
+    "answer": 42,
+    "explanation": "Simple addition: 15 + 27 = 42"
+  },
+  {
+    "id": 2,
+    "category": "arithmetic",
+    "difficulty": "medium",
+    "question": "If a store sells 3 apples for $2.40, how much do 7 apples cost?",
+    "answer": 5.60,
+    "explanation": "First find price per apple: $2.40 ÷ 3 = $0.80. Then multiply by 7: $0.80 × 7 = $5.60"
+  },
+  {
+    "id": 3,
+    "category": "algebra",
+    "difficulty": "easy",
+    "question": "Solve for x: 2x + 5 = 13",
+    "answer": 4,
+    "explanation": "Subtract 5 from both sides: 2x = 8. Then divide by 2: x = 4"
+  },
+  {
+    "id": 4,
+    "category": "algebra",
+    "difficulty": "medium",
+    "question": "If 3x - 2y = 10 and x + y = 8, what is the value of x?",
+    "answer": 5.2,
+    "explanation": "From second equation: y = 8 - x. Substitute into first: 3x - 2(8-x) = 10. Solve: 3x - 16 + 2x = 10, 5x = 26, x = 5.2"
+  },
+  {
+    "id": 5,
+    "category": "geometry",
+    "difficulty": "easy",
+    "question": "What is the area of a rectangle with length 8 cm and width 5 cm?",
+    "answer": 40,
+    "explanation": "Area of rectangle = length × width = 8 × 5 = 40 cm²"
+  },
+  {
+    "id": 6,
+    "category": "geometry",
+    "difficulty": "medium",
+    "question": "A circle has a radius of 6 cm. What is its circumference? (Use π ≈ 3.14)",
+    "answer": 37.68,
+    "explanation": "Circumference = 2πr = 2 × 3.14 × 6 = 37.68 cm"
+  },
+  {
+    "id": 7,
+    "category": "word_problems",
+    "difficulty": "easy",
+    "question": "Sarah has 24 stickers. She gives away 1/3 of them to her friend. How many stickers does she have left?",
+    "answer": 16,
+    "explanation": "She gives away 24 × (1/3) = 8 stickers. She has 24 - 8 = 16 stickers left"
+  },
+  {
+    "id": 8,
+    "category": "word_problems",
+    "difficulty": "medium",
+    "question": "A train travels 240 miles in 4 hours. If it maintains the same speed, how long will it take to travel 360 miles?",
+    "answer": 6,
+    "explanation": "Speed = 240 miles ÷ 4 hours = 60 mph. Time for 360 miles = 360 ÷ 60 = 6 hours"
+  },
+  {
+    "id": 9,
+    "category": "fractions",
+    "difficulty": "easy",
+    "question": "What is 3/4 + 1/2?",
+    "answer": 1.25,
+    "explanation": "Convert to common denominator: 3/4 + 2/4 = 5/4 = 1.25"
+  },
+  {
+    "id": 10,
+    "category": "fractions",
+    "difficulty": "medium",
+    "question": "If 2/3 of a number is 18, what is the number?",
+    "answer": 27,
+    "explanation": "Let x be the number. Then (2/3)x = 18. Multiply both sides by 3/2: x = 18 × (3/2) = 27"
+  },
+  {
+    "id": 11,
+    "category": "percentages",
+    "difficulty": "easy",
+    "question": "What is 25% of 80?",
+    "answer": 20,
+    "explanation": "25% of 80 = 0.25 × 80 = 20"
+  },
+  {
+    "id": 12,
+    "category": "percentages",
+    "difficulty": "medium",
+    "question": "A shirt originally costs $40. It's on sale for 20% off. What is the sale price?",
+    "answer": 32,
+    "explanation": "Discount = 20% of $40 = $8. Sale price = $40 - $8 = $32"
+  },
+  {
+    "id": 13,
+    "category": "logic",
+    "difficulty": "easy",
+    "question": "If all roses are flowers and all flowers need water, do all roses need water?",
+    "answer": "yes",
+    "explanation": "Yes, this follows from the transitive property: if roses are flowers and flowers need water, then roses need water"
+  },
+  {
+    "id": 14,
+    "category": "logic",
+    "difficulty": "medium",
+    "question": "In a group of 30 people, 18 like pizza and 15 like burgers. If 8 people like both, how many like neither?",
+    "answer": 5,
+    "explanation": "Using inclusion-exclusion: 18 + 15 - 8 = 25 like at least one. So 30 - 25 = 5 like neither"
+  },
+  {
+    "id": 15,
+    "category": "sequences",
+    "difficulty": "easy",
+    "question": "What is the next number in the sequence: 2, 4, 8, 16, ?",
+    "answer": 32,
+    "explanation": "Each number is double the previous: 2×2=4, 4×2=8, 8×2=16, 16×2=32"
+  },
+  {
+    "id": 16,
+    "category": "sequences",
+    "difficulty": "medium",
+    "question": "What is the 10th term in the sequence: 3, 7, 11, 15, ...?",
+    "answer": 39,
+    "explanation": "This is an arithmetic sequence with first term a=3 and common difference d=4. The nth term is a + (n-1)d = 3 + (10-1)×4 = 3 + 36 = 39"
+  },
+  {
+    "id": 17,
+    "category": "probability",
+    "difficulty": "easy",
+    "question": "What is the probability of rolling a 3 on a fair 6-sided die?",
+    "answer": 0.167,
+    "explanation": "There is 1 favorable outcome out of 6 possible outcomes, so P = 1/6 ≈ 0.167"
+  },
+  {
+    "id": 18,
+    "category": "probability",
+    "difficulty": "medium",
+    "question": "If you flip a coin 3 times, what is the probability of getting exactly 2 heads?",
+    "answer": 0.375,
+    "explanation": "There are 3 ways to get exactly 2 heads (HHT, HTH, THH) out of 8 total outcomes. P = 3/8 = 0.375"
+  },
+  {
+    "id": 19,
+    "category": "exponents",
+    "difficulty": "easy",
+    "question": "What is 2^5?",
+    "answer": 32,
+    "explanation": "2^5 = 2 × 2 × 2 × 2 × 2 = 32"
+  },
+  {
+    "id": 20,
+    "category": "exponents",
+    "difficulty": "medium",
+    "question": "What is the value of x if 2^x = 64?",
+    "answer": 6,
+    "explanation": "Since 64 = 2^6, we have 2^x = 2^6, so x = 6"
+  }
+]

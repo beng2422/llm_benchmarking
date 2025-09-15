@@ -2,7 +2,7 @@
 
 **LLM Benchmarking Suite** is a comprehensive framework for evaluating large language models across multiple benchmarks. This project provides:
 
-- **Multiple Benchmarks**: Empathy, Commonsense Reasoning, and more
+- **Multiple Benchmarks**: Empathy, Commonsense Reasoning, Math Reasoning, and more
 - **Unified Evaluation Framework**: Consistent evaluation across all benchmarks
 - **Model Adapters**: Support for OpenAI, Anthropic, and other providers
 - **Extensible Architecture**: Easy to add new benchmarks and models
@@ -21,9 +21,12 @@ llm-benchmarking/
 │   ├── empathy/                 # Empathy response selection
 │   │   ├── data/
 │   │   └── empathy_benchmark.py
-│   └── commonsense/             # Commonsense reasoning
+│   ├── commonsense/             # Commonsense reasoning
+│   │   ├── data/
+│   │   └── commonsense_benchmark.py
+│   └── math_reasoning/          # Mathematical reasoning
 │       ├── data/
-│       └── commonsense_benchmark.py
+│       └── math_reasoning_benchmark.py
 ├── models/                      # Model adapters
 │   ├── openai_adapter.py        # OpenAI API integration
 │   └── base_adapter.py          # Base adapter interface
@@ -54,7 +57,7 @@ llm-benchmarking/
 
 4. Run specific benchmarks:
    ```bash
-   python run_evaluation.py --benchmarks empathy commonsense --model gpt-4o-mini
+   python run_evaluation.py --benchmarks empathy commonsense math_reasoning --model gpt-4o-mini
    ```
 
 5. List available benchmarks:
@@ -92,6 +95,20 @@ Tests basic commonsense reasoning abilities with multiple-choice questions.
     "D": "The glass will float in the air"
   },
   "correct_answer": "B"
+}
+```
+
+### Math Reasoning Benchmark
+Evaluates mathematical problem-solving abilities across multiple domains including arithmetic, algebra, geometry, word problems, fractions, percentages, logic, sequences, probability, and exponents.
+
+**Example:**
+```json
+{
+  "question": "If a store sells 3 apples for $2.40, how much do 7 apples cost?",
+  "answer": 5.60,
+  "category": "arithmetic",
+  "difficulty": "medium",
+  "explanation": "First find price per apple: $2.40 ÷ 3 = $0.80. Then multiply by 7: $0.80 × 7 = $5.60"
 }
 ```
 

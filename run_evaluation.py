@@ -19,12 +19,14 @@ from framework.registry import BenchmarkRegistry
 from models.openai_adapter import OpenAIAdapter
 from benchmarks.empathy.empathy_benchmark import EmpathyBenchmark
 from benchmarks.commonsense.commonsense_benchmark import CommonsenseBenchmark
+from benchmarks.math_reasoning.math_reasoning_benchmark import MathReasoningBenchmark
 
 
 def register_benchmarks():
     """Register all available benchmarks."""
     BenchmarkRegistry.register("empathy", EmpathyBenchmark)
     BenchmarkRegistry.register("commonsense", CommonsenseBenchmark)
+    BenchmarkRegistry.register("math_reasoning", MathReasoningBenchmark)
 
 
 def create_model_adapter(model_name: str, **kwargs):
