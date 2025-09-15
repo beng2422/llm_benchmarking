@@ -1,1 +1,0 @@
-# Fixed email configuration
