@@ -20,6 +20,7 @@ from models.openai_adapter import OpenAIAdapter
 from benchmarks.empathy.empathy_benchmark import EmpathyBenchmark
 from benchmarks.commonsense.commonsense_benchmark import CommonsenseBenchmark
 from benchmarks.math_reasoning.math_reasoning_benchmark import MathReasoningBenchmark
+from benchmarks.code_generation.code_generation_benchmark import CodeGenerationBenchmark
 
 
 def register_benchmarks():
@@ -27,6 +28,7 @@ def register_benchmarks():
     BenchmarkRegistry.register("empathy", EmpathyBenchmark)
     BenchmarkRegistry.register("commonsense", CommonsenseBenchmark)
     BenchmarkRegistry.register("math_reasoning", MathReasoningBenchmark)
+    BenchmarkRegistry.register("code_generation", CodeGenerationBenchmark)
 
 
 def create_model_adapter(model_name: str, **kwargs):

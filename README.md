@@ -2,7 +2,7 @@
 
 **LLM Benchmarking Suite** is a comprehensive framework for evaluating large language models across multiple benchmarks. This project provides:
 
-- **Multiple Benchmarks**: Empathy, Commonsense Reasoning, Math Reasoning, and more
+- **Multiple Benchmarks**: Empathy, Commonsense Reasoning, Math Reasoning, Code Generation, and more
 - **Unified Evaluation Framework**: Consistent evaluation across all benchmarks
 - **Model Adapters**: Support for OpenAI, Anthropic, and other providers
 - **Extensible Architecture**: Easy to add new benchmarks and models
@@ -24,9 +24,12 @@ llm-benchmarking/
 │   ├── commonsense/             # Commonsense reasoning
 │   │   ├── data/
 │   │   └── commonsense_benchmark.py
-│   └── math_reasoning/          # Mathematical reasoning
+│   ├── math_reasoning/          # Mathematical reasoning
+│   │   ├── data/
+│   │   └── math_reasoning_benchmark.py
+│   └── code_generation/         # Code generation
 │       ├── data/
-│       └── math_reasoning_benchmark.py
+│       └── code_generation_benchmark.py
 ├── models/                      # Model adapters
 │   ├── openai_adapter.py        # OpenAI API integration
 │   └── base_adapter.py          # Base adapter interface
@@ -57,7 +60,7 @@ llm-benchmarking/
 
 4. Run specific benchmarks:
    ```bash
-   python run_evaluation.py --benchmarks empathy commonsense math_reasoning --model gpt-4o-mini
+   python run_evaluation.py --benchmarks empathy commonsense math_reasoning code_generation --model gpt-4o-mini
    ```
 
 5. List available benchmarks:
@@ -109,6 +112,25 @@ Evaluates mathematical problem-solving abilities across multiple domains includi
   "category": "arithmetic",
   "difficulty": "medium",
   "explanation": "First find price per apple: $2.40 ÷ 3 = $0.80. Then multiply by 7: $0.80 × 7 = $5.60"
+}
+```
+
+### Code Generation Benchmark
+Tests programming abilities across multiple languages (Python, JavaScript, Java) with problems covering algorithms, data structures, and problem-solving. Features automated code execution and validation.
+
+**Example:**
+```json
+{
+  "title": "Fibonacci Sequence",
+  "description": "Write a function that returns the nth Fibonacci number.",
+  "language": "python",
+  "difficulty": "medium",
+  "category": "algorithms",
+  "function_signature": "def fibonacci(n):",
+  "test_cases": [
+    {"input": {"n": 5}, "expected_output": 5},
+    {"input": {"n": 10}, "expected_output": 55}
+  ]
 }
 ```
 
