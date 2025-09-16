@@ -1,0 +1,82 @@
+# LLM Benchmarking Suite Configuration
+
+# Model configurations
+models:
+  openai:
+    default_model: "gpt-4o-mini"
+    api_timeout: 30
+    max_retries: 3
+    retry_delay: 1.0
+    default_params:
+      max_tokens: 50
+      temperature: 0.0
+      top_p: 1.0
+    models:
+      gpt-4o:
+        max_tokens: 100
+        temperature: 0.0
+      gpt-4o-mini:
+        max_tokens: 50
+        temperature: 0.0
+      gpt-3.5-turbo:
+        max_tokens: 50
+        temperature: 0.0
+
+# Benchmark configurations
+benchmarks:
+  empathy:
+    enabled: true
+    data_path: "benchmarks/empathy/data"
+    max_examples: null  # null means all examples
+    timeout: 60
+  commonsense:
+    enabled: true
+    data_path: "benchmarks/commonsense/data"
+    max_examples: null
+    timeout: 60
+  math_reasoning:
+    enabled: true
+    data_path: "benchmarks/math_reasoning/data"
+    max_examples: null
+    timeout: 120
+  code_generation:
+    enabled: true
+    data_path: "benchmarks/code_generation/data"
+    max_examples: null
+    timeout: 180
+    execution_timeout: 10
+
+# Evaluation settings
+evaluation:
+  parallel_benchmarks: true
+  parallel_examples: false  # Set to true for large datasets
+  max_workers: 4
+  save_detailed_results: true
+  generate_leaderboard: true
+  results_dir: "results"
+  cache_results: true
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/benchmarking.log"
+  max_size: "10MB"
+  backup_count: 5
+
+# Web dashboard settings
+dashboard:
+  enabled: false
+  host: "localhost"
+  port: 8080
+  debug: false
+
+# Data validation
+data_validation:
+  strict_mode: false
+  validate_schemas: true
+  required_fields:
+    empathy: ["id", "patient", "empathetic", "non_empathetic"]
+    commonsense: ["id", "question", "options", "correct_answer"]
+    math_reasoning: ["id", "question", "answer", "category", "difficulty"]
+    code_generation: ["id", "title", "description", "function_signature", "test_cases", "language"]

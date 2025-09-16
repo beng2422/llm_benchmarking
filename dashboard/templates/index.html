@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - LLM Benchmarking Suite{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#runEvaluationModal">
+            <i class="fas fa-play"></i> Run Evaluation
+        </button>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-muted">Total Benchmarks</h6>
+                        <h3 class="mb-0">{{ benchmarks|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-tasks fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-muted">Recent Evaluations</h6>
+                        <h3 class="mb-0">{{ recent_results|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-muted">Avg Accuracy</h6>
+                        <h3 class="mb-0">
+                            {% if recent_results %}
+                                {{ "%.1f"|format((recent_results|map(attribute='accuracy')|list|sum / recent_results|length * 100)|round(1)) }}%
+                            {% else %}
+                                --
+                            {% endif %}
+                        </h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-target fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-muted">Total Runtime</h6>
+                        <h3 class="mb-0">
+                            {% if recent_results %}
+                                {{ formatDuration(recent_results|map(attribute='duration')|list|sum) }}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Benchmarks -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tasks"></i> Available Benchmarks</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for benchmark in benchmarks %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ benchmark.name|title }}</h6>
+                                <p class="card-text text-muted small">{{ benchmark.description }}</p>
+                                <span class="badge bg-success status-badge">
+                                    <i class="fas fa-check"></i> Enabled
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Results -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Results</h5>
+                <a href="{{ url_for('results') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_results %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Benchmark</th>
+                                <th>Model</th>
+                                <th>Accuracy</th>
+                                <th>Duration</th>
+                                <th>Timestamp</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in recent_results %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-primary">{{ result.benchmark }}</span>
+                                </td>
+                                <td>{{ result.model }}</td>
+                                <td>
+                                    <div class="progress-container" style="width: 100px; height: 20px;">
+                                        <div class="progress h-100" style="width: {{ (result.accuracy * 100)|round(1) }}%">
+                                            <span class="position-absolute w-100 text-center" style="font-size: 0.7em; line-height: 20px;">
+                                                {{ "%.1f"|format(result.accuracy * 100) }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ formatDuration(result.duration) }}</td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ result.timestamp[:19].replace('T', ' ') if result.timestamp else 'Unknown' }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('result_detail', filename=result.filename) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                    <p>No recent results available. Run an evaluation to get started!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Run Evaluation Modal -->
+<div class="modal fade" id="runEvaluationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Run Evaluation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="evaluationForm">
+                    <div class="mb-3">
+                        <label for="modelSelect" class="form-label">Model</label>
+                        <select class="form-select" id="modelSelect" name="model">
+                            <option value="gpt-4o-mini">GPT-4o Mini</option>
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Benchmarks</label>
+                        <div class="row">
+                            {% for benchmark in benchmarks %}
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           value="{{ benchmark.name }}" 
+                                           id="benchmark_{{ benchmark.name }}" 
+                                           name="benchmarks" checked>
+                                    <label class="form-check-label" for="benchmark_{{ benchmark.name }}">
+                                        {{ benchmark.name|title }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   id="parallelCheck" name="parallel" checked>
+                            <label class="form-check-label" for="parallelCheck">
+                                Run benchmarks in parallel
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="runEvaluationBtn">
+                    <i class="fas fa-play"></i> Run Evaluation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('runEvaluationBtn').addEventListener('click', function() {
+    const form = document.getElementById('evaluationForm');
+    const formData = new FormData(form);
+    
+    const data = {
+        model: formData.get('model'),
+        benchmarks: formData.getAll('benchmarks'),
+        parallel: formData.has('parallel')
+    };
+    
+    const button = this;
+    const originalContent = showLoading(button);
+    
+    fetch('/run_evaluation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading(button, originalContent);
+        
+        if (data.success) {
+            showAlert('Evaluation completed successfully!', 'success');
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('runEvaluationModal'));
+            modal.hide();
+            // Reload page to show new results
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showAlert('Evaluation failed: ' + data.error, 'danger');
+        }
+    })
+    .catch(error => {
+        hideLoading(button, originalContent);
+        showAlert('Error running evaluation: ' + error.message, 'danger');
+    });
+});
+</script>
+{% endblock %}

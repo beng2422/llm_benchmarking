@@ -4,18 +4,24 @@ Unified evaluator for running multiple benchmarks.
 
 import os
 import json
+import time
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from .base_benchmark import BaseBenchmark
 from .registry import BenchmarkRegistry
+from .parallel_executor import ParallelExecutor, ProgressTracker
+from .logger import logger
+from .config_manager import config
 
 
 class BenchmarkEvaluator:
     """Unified evaluator for running benchmarks across multiple models."""
     
-    def __init__(self, results_dir: str = "results"):
-        self.results_dir = results_dir
-        os.makedirs(results_dir, exist_ok=True)
+    def __init__(self, results_dir: Optional[str] = None):
+        self.results_dir = results_dir or config.get('evaluation.results_dir', 'results')
+        self.parallel_executor = ParallelExecutor()
+        self.logger = logger
+        os.makedirs(self.results_dir, exist_ok=True)
     
     def run_benchmark(
         self, 
@@ -36,30 +42,54 @@ class BenchmarkEvaluator:
         Returns:
             Dictionary containing results and metrics
         """
-        # Get benchmark instance
-        benchmark = BenchmarkRegistry.get_benchmark(benchmark_name)
+        start_time = time.time()
         
-        # Run evaluation
-        print(f"Running {benchmark_name} with {model_name}...")
-        results = benchmark.evaluate_model(model_name, model_func, **model_kwargs)
-        
-        # Calculate metrics
-        metrics = benchmark.calculate_metrics(results)
-        
-        # Prepare final results
-        final_results = {
-            "benchmark": benchmark_name,
-            "model": model_name,
-            "timestamp": datetime.now().isoformat(),
-            "metrics": metrics,
-            "num_examples": len(results),
-            "results": results
-        }
-        
-        # Save results
-        self._save_results(final_results)
-        
-        return final_results
+        try:
+            # Get benchmark instance
+            benchmark = BenchmarkRegistry.get_benchmark(benchmark_name)
+            data = benchmark.get_data()
+            
+            # Log benchmark start
+            self.logger.log_benchmark_start(benchmark_name, model_name, len(data))
+            
+            # Run evaluation
+            results = benchmark.evaluate_model(model_name, model_func, **model_kwargs)
+            
+            # Calculate metrics
+            metrics = benchmark.calculate_metrics(results)
+            
+            duration = time.time() - start_time
+            
+            # Prepare final results
+            final_results = {
+                "benchmark": benchmark_name,
+                "model": model_name,
+                "timestamp": datetime.now().isoformat(),
+                "metrics": metrics,
+                "num_examples": len(results),
+                "results": results,
+                "duration": duration
+            }
+            
+            # Save results if configured
+            if config.get('evaluation.save_detailed_results', True):
+                self._save_results(final_results)
+            
+            # Log completion
+            self.logger.log_benchmark_complete(benchmark_name, model_name, metrics, duration)
+            
+            return final_results
+            
+        except Exception as e:
+            duration = time.time() - start_time
+            self.logger.log_error(e, f"benchmark {benchmark_name}")
+            return {
+                "benchmark": benchmark_name,
+                "model": model_name,
+                "timestamp": datetime.now().isoformat(),
+                "error": str(e),
+                "duration": duration
+            }
     
     def run_all_benchmarks(
         self, 
@@ -81,16 +111,60 @@ class BenchmarkEvaluator:
             Dictionary mapping benchmark names to results
         """
         if benchmark_names is None:
-            benchmark_names = BenchmarkRegistry.list_benchmarks()
+            # Get enabled benchmarks from config
+            benchmark_names = config.get_enabled_benchmarks()
         
-        all_results = {}
+        # Filter out disabled benchmarks
+        enabled_benchmarks = [name for name in benchmark_names if config.is_benchmark_enabled(name)]
+        
+        if not enabled_benchmarks:
+            self.logger.warning("No enabled benchmarks found")
+            return {}
+        
+        self.logger.info(f"Running {len(enabled_benchmarks)} benchmarks", 
+                        model=model_name, benchmarks=enabled_benchmarks)
+        
+        # Check if parallel execution is enabled
+        if config.get('evaluation.parallel_benchmarks', True) and len(enabled_benchmarks) > 1:
+            return self._run_benchmarks_parallel(enabled_benchmarks, model_name, model_func, **model_kwargs)
+        else:
+            return self._run_benchmarks_sequential(enabled_benchmarks, model_name, model_func, **model_kwargs)
+    
+    def _run_benchmarks_parallel(self, benchmark_names: List[str], model_name: str, 
+                                model_func: callable, **model_kwargs) -> Dict[str, Dict[str, Any]]:
+        """Run benchmarks in parallel."""
+        # Prepare benchmark configurations
+        benchmark_configs = []
         for benchmark_name in benchmark_names:
-            try:
-                results = self.run_benchmark(benchmark_name, model_name, model_func, **model_kwargs)
-                all_results[benchmark_name] = results
-            except Exception as e:
-                print(f"Error running {benchmark_name}: {e}")
-                all_results[benchmark_name] = {"error": str(e)}
+            benchmark_class = BenchmarkRegistry._benchmarks[benchmark_name]
+            config_kwargs = config.get_benchmark_config(benchmark_name)
+            benchmark_configs.append({
+                'name': benchmark_name,
+                'class': benchmark_class,
+                'model_name': model_name,
+                'kwargs': config_kwargs
+            })
+        
+        # Run in parallel
+        return self.parallel_executor.run_benchmarks_parallel(
+            benchmark_configs, model_func, **model_kwargs
+        )
+    
+    def _run_benchmarks_sequential(self, benchmark_names: List[str], model_name: str, 
+                                  model_func: callable, **model_kwargs) -> Dict[str, Dict[str, Any]]:
+        """Run benchmarks sequentially."""
+        all_results = {}
+        
+        with ProgressTracker(len(benchmark_names), "Running benchmarks") as progress:
+            for benchmark_name in benchmark_names:
+                try:
+                    results = self.run_benchmark(benchmark_name, model_name, model_func, **model_kwargs)
+                    all_results[benchmark_name] = results
+                    progress.update(1, benchmark=benchmark_name)
+                except Exception as e:
+                    self.logger.log_error(e, f"benchmark {benchmark_name}")
+                    all_results[benchmark_name] = {"error": str(e)}
+                    progress.update(1, benchmark=benchmark_name)
         
         return all_results
     
